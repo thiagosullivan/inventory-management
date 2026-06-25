@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "hexclave dev --config-file ./hexclave.config.ts -- npm run dev:inner",
+    "dev": "npx hexclave dev --config-file ./hexclave.config.ts -- npm run dev:inner",
     "dev:inner": "next dev",
     "build": "next build",
     "start": "next start",
@@ -16,6 +16,7 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@hexclave/cli": "^1.0.28",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
