@@ -1,3 +1,4 @@
+import ProductsChart from "@/components/products-chart";
 import SideBar from "@/components/sidebar";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -24,6 +25,30 @@ export default async function DashboardPage() {
     (sum, product) => sum + Number(product.price) * Number(product.quantity),
     0,
   );
+
+  const now = new Date();
+  const weeklyProductsData = [];
+  for (let i = 11; i >= 0; i--) {
+    const weekStart = new Date(now);
+    weekStart.setDate(weekStart.getDate() - i * 7);
+    weekStart.setHours(0, 0, 0, 0);
+
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
+
+    const weekLabel = `${String(weekStart.getMonth() + 1).padStart(2, "0")}/${String(weekStart.getDate() + 1).padStart(2, "0")}`;
+
+    const weekProducts = allProducts.filter((product) => {
+      const productDate = new Date(product.createdAt);
+      return productDate >= weekStart && productDate <= weekEnd;
+    });
+
+    weeklyProductsData.push({
+      week: weekLabel,
+      products: weekProducts.length,
+    });
+  }
 
   const recent = await prisma.product.findMany({
     orderBy: { createdAt: "desc" },
@@ -88,6 +113,17 @@ export default async function DashboardPage() {
                   <TrendingUp className="w-3 h-3 text-green-600 ml-1" />
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Inventory over time */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2>New products per week</h2>
+            </div>
+
+            <div className="h-48">
+              <ProductsChart data={weeklyProductsData} />
             </div>
           </div>
         </div>
