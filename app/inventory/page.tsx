@@ -3,9 +3,17 @@ import SideBar from "@/components/sidebar";
 import { deleteProduct } from "@/lib/actions/products";
 import { prisma } from "@/lib/prisma";
 
-export default async function InventoryPage() {
-  const totalProducts = await prisma.product.findMany();
+export default async function InventoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const params = await searchParams;
+  const q = (params.q ?? "").trim();
 
+  const totalProducts = await prisma.product.findMany({
+    where: { name: { contains: q, mode: "insensitive" } },
+  });
   return (
     <div className="min-h-screen bg-gray-50">
       <SideBar currentPath="/inventory" />
